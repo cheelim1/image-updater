@@ -12,8 +12,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type YamlFile struct {
+	KustomizePath string `yaml:"kustomizePath"`
+	Image         string `yaml:"image"`
+	ImageTag      string `yaml:"imageTag"`
+}
+
 func main() {
-    // Fetch the necessary environment variables based on action.yml
 	token := os.Getenv("INPUT_GITHUB_TOKEN")
 	if token == "" {
 		log.Fatal("INPUT_GITHUB_TOKEN is not set")
@@ -39,7 +44,6 @@ func main() {
 		log.Fatal("INPUT_IMAGE_TAG is not set")
 	}
 
-    // Setup the GitHub client
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -48,7 +52,6 @@ func main() {
 
 	client := github.NewClient(tc)
 
-    // Fetch the file content from the GitHub repo
 	fileContent, _, _, err := client.Repositories.GetContents(ctx, repoOwner, repoName, filePath, nil)
 	if err != nil {
 		log.Fatalf("Failed to get content: %v", err)
@@ -59,20 +62,18 @@ func main() {
 		log.Fatalf("Failed to decode content: %v", err)
 	}
 
-    // Update the 'imageTag' in the YAML
-	var yamlData map[string]interface{}
+	var yamlData YamlFile
 	err = yaml.Unmarshal([]byte(content), &yamlData)
 	if err != nil {
 		log.Fatalf("Failed to unmarshal YAML: %v", err)
 	}
 
-	yamlData["imageTag"] = newTag
+	yamlData.ImageTag = newTag
 	updatedYaml, err := yaml.Marshal(yamlData)
 	if err != nil {
 		log.Fatalf("Failed to marshal YAML: %v", err)
 	}
 
-    // Update the file in the GitHub repo with the new content
 	encodedContent := base64.StdEncoding.EncodeToString(updatedYaml)
 	opts := &github.RepositoryContentFileOptions{
 		Message:   github.String(fmt.Sprintf("Update imageTag to %s", newTag)),
