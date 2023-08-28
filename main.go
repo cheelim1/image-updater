@@ -18,6 +18,11 @@ func main() {
 		log.Fatal("GITHUB_TOKEN is not set")
 	}
 
+	repoOwner := os.Getenv("REPO_OWNER")
+    if repoOwner == "" {
+        log.Fatal("REPO_OWNER is not set")
+    }
+
 	repoName := os.Getenv("REPO_NAME")
 	if repoName == "" {
 		log.Fatal("REPO_NAME is not set")
@@ -41,7 +46,7 @@ func main() {
 
 	client := github.NewClient(tc)
 
-	fileContent, _, _, err := client.Repositories.GetContents(ctx, "ml", repoName, filePath, nil)
+	fileContent, _, _, err := client.Repositories.GetContents(ctx, repoOwner, repoName, filePath, nil)
 	if err != nil {
 		log.Fatalf("Failed to get content: %v", err)
 	}
@@ -72,7 +77,7 @@ func main() {
 		Committer: &github.CommitAuthor{Name: github.String("GitHub Actions"), Email: github.String("actions@github.com")},
 	}
 
-	_, _, err = client.Repositories.UpdateFile(ctx, "ml", repoName, filePath, opts)
+	_, _, err = client.Repositories.UpdateFile(ctx, repoOwner, repoName, filePath, opts)
 	if err != nil {
 		log.Fatalf("Failed to update file: %v", err)
 	}

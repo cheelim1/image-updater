@@ -1,5 +1,5 @@
 FROM golang:1.17
 
-ADD update-image-tag /update-image-tag
+ADD image-updater /image-updater
 
-ENTRYPOINT ["/update-image-tag"]
+ENTRYPOINT ["/image-updater"]

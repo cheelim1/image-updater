@@ -23,7 +23,7 @@ jobs:
         
       # Compile Go code to create the binary
       - name: Compile Go code
-        run: GOOS=linux GOARCH=amd64 go build -o update-image-tag main.go
+        run: GOOS=linux GOARCH=amd64 go build -o image-updater main.go
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
