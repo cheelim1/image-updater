@@ -1,0 +1,26 @@
+name: 'Update Image Tag Go'
+description: 'Updates the image tag in a YAML file using Go and the GitHub API'
+branding:
+  icon: 'info'
+  color: 'blue'
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub token'
+    required: true
+  REPO_NAME:
+    description: 'Repository name'
+    required: true
+  FILE_PATH:
+    description: 'Path to the YAML file'
+    required: true
+  IMAGE_TAG:
+    description: 'The new image tag'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - --GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}
+    - --REPO_NAME=${{ inputs.REPO_NAME }}
+    - --FILE_PATH=${{ inputs.FILE_PATH }}
+    - --IMAGE_TAG=${{ inputs.IMAGE_TAG }}
