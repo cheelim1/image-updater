@@ -16,11 +16,15 @@ inputs:
   IMAGE_TAG:
     description: 'The new image tag'
     required: true
+  REPO_OWNER:
+    description: 'Repository Owner'
+    required: true
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
     - --GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}
+    - --REPO_OWNER=${{ inputs.REPO_OWNER }}
     - --REPO_NAME=${{ inputs.REPO_NAME }}
     - --FILE_PATH=${{ inputs.FILE_PATH }}
     - --IMAGE_TAG=${{ inputs.IMAGE_TAG }}
