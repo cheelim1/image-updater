@@ -23,8 +23,8 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - --GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}
-    - --REPO_OWNER=${{ inputs.REPO_OWNER }}
-    - --REPO_NAME=${{ inputs.REPO_NAME }}
-    - --FILE_PATH=${{ inputs.FILE_PATH }}
-    - --IMAGE_TAG=${{ inputs.IMAGE_TAG }}
+    - -e GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}
+    - -e REPO_OWNER=${{ inputs.REPO_OWNER }}
+    - -e REPO_NAME=${{ inputs.REPO_NAME }}
+    - -e FILE_PATH=${{ inputs.FILE_PATH }}
+    - -e IMAGE_TAG=${{ inputs.IMAGE_TAG }}
