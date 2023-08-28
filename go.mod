@@ -1,6 +1,6 @@
 module github.com/cheelim1/image-updater
 
-go 1.21.0
+go 1.23.0
 
 require (
 	github.com/google/go-github/v37 v37.0.0
