@@ -13,31 +13,33 @@ import (
 )
 
 func main() {
-	token := os.Getenv("GITHUB_TOKEN")
+    // Fetch the necessary environment variables based on action.yml
+	token := os.Getenv("INPUT_GITHUB_TOKEN")
 	if token == "" {
-		log.Fatal("GITHUB_TOKEN is not set")
+		log.Fatal("INPUT_GITHUB_TOKEN is not set")
 	}
 
-	repoOwner := os.Getenv("REPO_OWNER")
+	repoOwner := os.Getenv("INPUT_REPO_OWNER")
     if repoOwner == "" {
-        log.Fatal("REPO_OWNER is not set")
+        log.Fatal("INPUT_REPO_OWNER is not set")
     }
 
-	repoName := os.Getenv("REPO_NAME")
+	repoName := os.Getenv("INPUT_REPO_NAME")
 	if repoName == "" {
-		log.Fatal("REPO_NAME is not set")
+		log.Fatal("INPUT_REPO_NAME is not set")
 	}
 
-	filePath := os.Getenv("FILE_PATH")
+	filePath := os.Getenv("INPUT_FILE_PATH")
 	if filePath == "" {
-		log.Fatal("FILE_PATH is not set")
+		log.Fatal("INPUT_FILE_PATH is not set")
 	}
 
-	newTag := os.Getenv("IMAGE_TAG")
+	newTag := os.Getenv("INPUT_IMAGE_TAG")
 	if newTag == "" {
-		log.Fatal("IMAGE_TAG is not set")
+		log.Fatal("INPUT_IMAGE_TAG is not set")
 	}
 
+    // Setup the GitHub client
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -46,6 +48,7 @@ func main() {
 
 	client := github.NewClient(tc)
 
+    // Fetch the file content from the GitHub repo
 	fileContent, _, _, err := client.Repositories.GetContents(ctx, repoOwner, repoName, filePath, nil)
 	if err != nil {
 		log.Fatalf("Failed to get content: %v", err)
@@ -56,6 +59,7 @@ func main() {
 		log.Fatalf("Failed to decode content: %v", err)
 	}
 
+    // Update the 'imageTag' in the YAML
 	var yamlData map[string]interface{}
 	err = yaml.Unmarshal([]byte(content), &yamlData)
 	if err != nil {
@@ -68,6 +72,7 @@ func main() {
 		log.Fatalf("Failed to marshal YAML: %v", err)
 	}
 
+    // Update the file in the GitHub repo with the new content
 	encodedContent := base64.StdEncoding.EncodeToString(updatedYaml)
 	opts := &github.RepositoryContentFileOptions{
 		Message:   github.String(fmt.Sprintf("Update imageTag to %s", newTag)),
@@ -84,4 +89,3 @@ func main() {
 
 	fmt.Println("Image tag updated successfully!")
 }
-
