@@ -1,7 +1,7 @@
-name: 'Update Image Tag Go'
-description: 'Updates the image tag in a YAML file using Go and the GitHub API'
+name: 'Update imageTag in YAML'
+description: 'Updates the imageTag in a YAML file using Go & GitHub API'
 branding:
-  icon: 'info'
+  icon: 'anchor'
   color: 'blue'
 inputs:
   GITHUB_TOKEN:
