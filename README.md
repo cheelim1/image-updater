@@ -34,4 +34,4 @@ jobs:
 4. FILE_PATH = File path of which imageTag exists to update.
 
 ### Optional Inputs
-1. GITHUB_BRANCH= Branch name to update the imageTag in the Github repository. If not declared defaults to `main`.
+1. GITHUB_BRANCH= Branch name to update the imageTag in the Github repository. If not set, defaults to `main`.
