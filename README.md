@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Update imageTag
-      uses: cheelim1/image-updater@v1.10
+      uses: cheelim1/image-updater@v1.11
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO_NAME: 'github-repository-name'
