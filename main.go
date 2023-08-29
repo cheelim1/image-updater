@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -49,7 +48,7 @@ func main() {
 
 	branch := extractBranchName(os.Getenv("INPUT_GITHUB_BRANCH"))
 	if branch == "" {
-		branch = "main" // default to "main" if INPUT_GITHUB_BRANCH is not set
+		branch = "main" // default to "main" if INPUT_GITHUB_BRANCH is not set or extraction fails
 	}
 
 	ctx := context.Background()
@@ -82,10 +81,9 @@ func main() {
 		log.Fatalf("Failed to marshal YAML: %v", err)
 	}
 
-	encodedContent := base64.StdEncoding.EncodeToString(updatedYaml)
 	opts := &github.RepositoryContentFileOptions{
 		Message:   github.String(fmt.Sprintf("Update imageTag to %s", newTag)),
-		Content:   []byte(encodedContent),
+		Content:   updatedYaml,
 		SHA:       fileContent.SHA,
 		Branch:    github.String(branch),
 		Committer: &github.CommitAuthor{Name: github.String("GitHub Actions"), Email: github.String("actions@github.com")},

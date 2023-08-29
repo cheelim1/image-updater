@@ -19,6 +19,9 @@ inputs:
   REPO_OWNER:
     description: 'Repository Owner'
     required: true
+  GITHUB_BRANCH:
+    description: 'Github Branch'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
