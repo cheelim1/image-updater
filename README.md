@@ -22,7 +22,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO_NAME: 'github-repository-name'
         REPO_OWNER: 'github-repo-owner'
-        FILE_PATH: '../xxx.yaml'
+        FILE_PATH: 'xxx/filename.yaml'
         IMAGE_TAG: 'newImageTagHere'
 ```
 
