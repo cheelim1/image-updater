@@ -6,16 +6,19 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/google/go-github/v37/github"
-	"gopkg.in/yaml.v2"
 	"golang.org/x/oauth2"
+	"gopkg.in/yaml.v2"
 )
 
-type YamlFile struct {
-	KustomizePath string `yaml:"kustomizePath"`
-	Image         string `yaml:"image"`
-	ImageTag      string `yaml:"imageTag"`
+func extractBranchName(ref string) string {
+	parts := strings.Split(ref, "/")
+	if len(parts) >= 3 {
+		return parts[2]
+	}
+	return "main" // default to "main" if extraction fails
 }
 
 func main() {
@@ -25,9 +28,9 @@ func main() {
 	}
 
 	repoOwner := os.Getenv("INPUT_REPO_OWNER")
-    if repoOwner == "" {
-        log.Fatal("INPUT_REPO_OWNER is not set")
-    }
+	if repoOwner == "" {
+		log.Fatal("INPUT_REPO_OWNER is not set")
+	}
 
 	repoName := os.Getenv("INPUT_REPO_NAME")
 	if repoName == "" {
@@ -44,10 +47,13 @@ func main() {
 		log.Fatal("INPUT_IMAGE_TAG is not set")
 	}
 
+	branch := extractBranchName(os.Getenv("INPUT_GITHUB_BRANCH"))
+	if branch == "" {
+		branch = "main" // default to "main" if INPUT_GITHUB_BRANCH is not set
+	}
+
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
@@ -62,13 +68,15 @@ func main() {
 		log.Fatalf("Failed to decode content: %v", err)
 	}
 
-	var yamlData YamlFile
+	var yamlData map[interface{}]interface{}
 	err = yaml.Unmarshal([]byte(content), &yamlData)
 	if err != nil {
 		log.Fatalf("Failed to unmarshal YAML: %v", err)
 	}
 
-	yamlData.ImageTag = newTag
+	// Deep-search and update "imageTag" key.
+	updateImageTag(yamlData, "imageTag", newTag)
+
 	updatedYaml, err := yaml.Marshal(yamlData)
 	if err != nil {
 		log.Fatalf("Failed to marshal YAML: %v", err)
@@ -79,7 +87,7 @@ func main() {
 		Message:   github.String(fmt.Sprintf("Update imageTag to %s", newTag)),
 		Content:   []byte(encodedContent),
 		SHA:       fileContent.SHA,
-		Branch:    github.String("main"), // or whatever branch you want
+		Branch:    github.String(branch),
 		Committer: &github.CommitAuthor{Name: github.String("GitHub Actions"), Email: github.String("actions@github.com")},
 	}
 
@@ -89,4 +97,16 @@ func main() {
 	}
 
 	fmt.Println("Image tag updated successfully!")
+}
+
+// Recursively searches and updates the given key in a nested map.
+func updateImageTag(data map[interface{}]interface{}, key string, newValue string) {
+	if v, ok := data[key]; ok && v != nil {
+		data[key] = newValue
+	}
+	for _, v := range data {
+		if nestedMap, ok := v.(map[interface{}]interface{}); ok {
+			updateImageTag(nestedMap, key, newValue)
+		}
+	}
 }
