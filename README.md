@@ -35,3 +35,6 @@ jobs:
 
 ### Optional Inputs
 1. GITHUB_BRANCH= Branch name to update the imageTag in the Github repository. If not set, defaults to `main`.
+
+## Expected Outcome from this Github Action
+1. It will only update the `imageTag` value in the YAML file you targeted.
